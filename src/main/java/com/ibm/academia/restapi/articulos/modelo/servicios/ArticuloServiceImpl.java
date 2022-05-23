@@ -7,17 +7,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-public class ItemDAOImpl implements ItemDAO {
+public class ArticuloServiceImpl implements IArticuloService {
 
     @Autowired
     private RestTemplate clienteRest;
 
     @Override
-    public List<Articulo> buscarTodos() {
+    public List<Articulo> buscarTodosArticulos() {
 
         List<Producto> productos = Arrays.asList(clienteRest.getForObject("http://localhost:8001/api/v1/rest-productos/producto/listar", Producto[].class));
 
@@ -29,7 +31,12 @@ public class ItemDAOImpl implements ItemDAO {
     }
 
     @Override
-    public Articulo buscarPorId(Long id, Integer cantidad) {
-        return null;
+    public Articulo buscarArticulosPorId(Long productoId, Integer cantidad) {
+
+        Map<String, String> variables = new HashMap<String, String>();
+        variables.put("productoId", productoId.toString());
+        Producto producto = clienteRest.getForObject("http://localhost:8001/api/v1/rest-productos/producto/ver-detalle/productoId/{productoId}", Producto.class, variables);
+
+        return new Articulo(producto, cantidad);
     }
 }
